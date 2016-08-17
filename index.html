@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+
+<head>
+  <script src="https://cdn.vaadin.com/vaadin-elements/latest/webcomponentsjs/webcomponents-lite.js"></script>
+  <link href="https://cdn.vaadin.com/vaadin-elements/latest/vaadin-grid/vaadin-grid.html" rel="import">
+  <script>
+  function getJSON(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+        callback(JSON.parse(xhr.responseText));
+      }
+    };
+    xhr.open('GET', url, true);
+    xhr.send();
+  }
+  </script>
+</head>
+
+<body>
+<vaadin-grid selection-mode="multi" size="1000">
+  <table>
+    <colgroup>
+      <col name="index" width="60">
+      <col name="user.picture.thumbnail" width="100">
+      <col name="user.name.first">
+      <col name="user.name.last">
+      <col name="user.email" flex="">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Pic</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+  </table>
+</vaadin-grid>
+<script>
+  var grid = grid || document.querySelector('vaadin-grid');
+
+  HTMLImports.whenReady(function() {
+    // code
+    grid.items = function(params, callback) {
+      var url = 'https://randomuser.me/api?index=' + params.index + '&results=' + params.count;
+      getJSON(url, function(data) {
+        callback(data.results);
+      });
+    };
+
+    // Add a renderer for the index column
+    grid.columns[0].renderer = function(cell) {
+      cell.element.innerHTML = cell.row.index;
+    };
+
+    // Add a renderer for the picture column
+    grid.columns[1].renderer = function(cell) {
+      cell.element.innerHTML = '';
+      var img = document.createElement('img');
+      img.style.width = '24px';
+      img.setAttribute('src', cell.data);
+      cell.element.appendChild(img);
+    };
+    // end-code
+  });
+</script>
+</body>
+
+</html>
